@@ -1,22 +1,31 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import React, { useContext, useEffect } from "react";
 import services from "../../utils/services";
 import { useRouter, Link } from "expo-router";
 import { client } from "@/utils/KindeConfig";
-import supabase from "../../utils/Supabase";
 import Header from "@/components/Header";
 import CircularChart from "@/components/CircularChart";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import CategoriesList from "@/components/CategoriesList";
+import { CategoriesContext } from "../../context/CategoriesContext";
 
 const Home = () => {
   const router = useRouter();
+  const { categoriesList, fetchCategories } = useContext(CategoriesContext);
 
   // use to check user is already or not logged in
   const checkUserAuth = async () => {
     try {
       const result = await services.getData("login");
-      console.log("Auth result:", result);
       if (result !== "true") {
         router.replace("/login");
       }
@@ -37,32 +46,23 @@ const Home = () => {
     }
   };
 
-  const getCategoriesList = async () => {
-    try {
-      const user = await client.getUserDetails();
-      const { data, error } = await supabase
-        .from("Categories")
-        .select("*")
-        .eq("created_by", user.email);
-      if (error) {
-        throw error;
-      }
-      console.log("Categories data:", data);
-    } catch (error) {
-      console.error("Error in getCategoriesList:", error);
-    }
-  };
-
   useEffect(() => {
-    // checkUserAuth();
-    // getCategoriesList();
+    fetchCategories();
   }, []);
 
   return (
     <View style={{ flex: 1 }}>
       <View>
-        {/* <Header />
-        <CircularChart /> */}
+        <Header />
+        <CircularChart />
+        <Text style={styles.label}>Latest Budget</Text>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          <CategoriesList categoriesList={categoriesList} />
+        </ScrollView>
       </View>
       <View style={styles.addBtnContainer}>
         <Link href="/add-new-category">
@@ -80,5 +80,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 20,
+    backgroundColor: "white",
+    padding: 0,
+    borderRadius: 50,
+  },
+  label: {
+    fontFamily: "rb",
+    fontSize: 20,
+    marginTop: 20,
+    marginLeft: 20,
+  },
+  scrollContainer: {
+    height: "50%",
   },
 });
