@@ -48,6 +48,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchCategories();
+    checkUserAuth();
   }, []);
 
   return (

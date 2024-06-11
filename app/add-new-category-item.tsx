@@ -147,11 +147,7 @@ const AddNewCategoryItem = () => {
             logo="pencil"
             placeholder="Note"
             keyboardType="default"
-            otherStyles={{
-              height: 100,
-              paddingTop: 10,
-              alignItems: "flex-start",
-            }}
+            otherStyles={{}}
           />
           <TouchableOpacity
             style={styles.submitBtn}

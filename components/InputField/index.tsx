@@ -27,14 +27,14 @@ const InputField = ({
   return (
     <KeyboardAvoidingView>
       <View
-        style={[styles.customView, isFocused && styles.focusStyle, otherStyles]}
+        style={[styles.customView, isFocused && styles.focusStyle, ]}
       >
-        <Ionicons name={logo} size={30} color={Colors.GRAY} />
+        {logo!=="" && <Ionicons name={logo} size={30} color={Colors.GRAY} />}
         <TextInput
           value={value}
           placeholder={placeholder}
           onChangeText={handleChangeText}
-          style={[styles.inputText]} // Adjust styles as needed
+          style={[styles.inputText, otherStyles]} // Adjust styles as needed
           placeholderTextColor="#7b7b8b"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -42,6 +42,7 @@ const InputField = ({
           keyboardType={keyboardType}
           {...props}
         />
+        {title==="Money"&&<Text style={{ fontSize: 30, fontFamily: 'rr', color: Colors.TEXT}}>$</Text>}
       </View>
     </KeyboardAvoidingView>
   );

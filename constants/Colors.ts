@@ -60,5 +60,7 @@ export const Colors = {
     '#65B741',
     '#527853',
   ],
-  GRAY: '#687076'
+  GRAY: '#687076',
+  EXPENSE:'#B80000',
+  INCOME:'#65B741',
 };

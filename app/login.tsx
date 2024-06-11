@@ -16,7 +16,7 @@ const Login = () => {
       };
 
   return (
-    <View>
+    <View style={styles.container}>
       <Image source={LoginBg} style={ styles.bg}/>
       <View style={styles.loginDeckContainer}>
         <View >
@@ -33,8 +33,11 @@ const Login = () => {
 export default Login
 
 const styles = StyleSheet.create({
+    container:{
+        padding: 0,
+    },
     bg: {
-        height: 600,
+        height: 450,
         width: '100%',
     },
     loginDeckContainer:{

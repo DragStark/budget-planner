@@ -1,15 +1,10 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import "react-native-reanimated";
 import { CategoriesProvider } from "../context/CategoriesContext";
-
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -18,7 +13,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  const [fontsLoaded, fontError] = useFonts({
+  const [fontsLoaded, fontsError] = useFonts({
     r: require("../assets/fonts/Rubik-Black.ttf"),
     rb: require("../assets/fonts/Rubik-Bold.ttf"),
     rsb: require("../assets/fonts/Rubik-SemiBold.ttf"),
@@ -26,24 +21,24 @@ export default function RootLayout() {
     rl: require("../assets/fonts/Rubik-Light.ttf"),
     rm: require("../assets/fonts/Rubik-Medium.ttf"),
     rr: require("../assets/fonts/Rubik-Regular.ttf"),
-  });
-
-  const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    async function hideSplashScreen() {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+      }
     }
-  }, [loaded]);
+    hideSplashScreen();
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
+  if (!fontsLoaded) {
+    return null; // You can also return a custom loading component here
   }
 
   return (
-    <ThemeProvider value={DefaultTheme}>
+    // <ThemeProvider value={colorScheme !== "dark" ? DarkTheme : DefaultTheme}>
       <CategoriesProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -68,9 +63,10 @@ export default function RootLayout() {
               presentation: "modal",
             }}
           />
+          <Stack.Screen name="edit-delete-item" options={{ headerShown: false, presentation: "modal" }}/>
           <Stack.Screen name="+not-found" />
         </Stack>
       </CategoriesProvider>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
 }
