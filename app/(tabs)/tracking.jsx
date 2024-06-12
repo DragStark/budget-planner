@@ -201,7 +201,7 @@ const Expenses = () => {
         Lịch sử
       </Text>
       <ScrollView style={styles.listContainer}>
-        <DayList expenseItems={filteredByTimeOption()} />
+        <DayList expenseItems={filteredByTimeOption().reverse()} />
       </ScrollView>
     </View>
   );

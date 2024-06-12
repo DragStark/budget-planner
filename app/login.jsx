@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     bg: {
-        height: 450,
+        height: 600,
         width: '100%',
     },
     loginDeckContainer: {

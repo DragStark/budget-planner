@@ -63,7 +63,7 @@ export default Header;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.PRIMARYB,
+    backgroundColor: Colors.PRIMARYA,
     height: 180,
   },
   infoContainer: {
