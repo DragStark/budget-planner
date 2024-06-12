@@ -14,8 +14,14 @@ const CategoryDetails = () => {
   const { categoriesList } = useContext(CategoriesContext);
 
   useEffect(() => {
+    let categoryIdString: string;
+    if (Array.isArray(categoryId)) {
+      categoryIdString = categoryId[0];
+    } else if (typeof categoryId === "string") {
+      categoryIdString = categoryId;
+    }
     if (categoryId && categoriesList.length > 0) {
-      const category = categoriesList.find((element) => element.id == categoryId);
+      const category = categoriesList.find((element: {id: number}) => element.id === parseInt(categoryIdString, 10));
       if (category) {
         setCategoryData(category);
       }
@@ -32,7 +38,7 @@ const CategoryDetails = () => {
         <Ionicons name="caret-back" size={50} color={Colors.PRIMARYA} />
       </TouchableOpacity>
       <CourseInfo data={categoryData} />
-      <Text style={styles.listTitle}> Item List</Text>
+      <Text style={styles.listTitle}> Danh sách mục chi</Text>
       <CourseItemList data={categoryData} />
       <View style={styles.addBtnContainer}>
         <TouchableOpacity
@@ -68,7 +74,7 @@ const styles = StyleSheet.create({
   },
   listTitle: {
     marginTop: 20,
-    fontFamily: "rb",
+    fontFamily: "ab",
     fontSize: 20,
     marginBottom: 20,
   },

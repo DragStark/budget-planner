@@ -21,6 +21,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
+          tabBarLabel: "Trang chủ"
         }}
       />
       <Tabs.Screen
@@ -30,6 +31,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
           ),
+          tabBarLabel: "Thêm"
         }}
       />
       <Tabs.Screen
@@ -39,6 +41,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'eye' : 'eye-outline'} color={color} />
           ),
+          tabBarLabel: "Lịch sử"
         }}
       />
       <Tabs.Screen
@@ -48,6 +51,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'wallet' : 'wallet-outline'} color={color} />
           ),
+          tabBarLabel: "Ví"
         }}
       />
       <Tabs.Screen
@@ -57,6 +61,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'person-circle' : 'person-circle-outline'} color={color} />
           ),
+          tabBarLabel: "Thông tin"
         }}
       />
     </Tabs>

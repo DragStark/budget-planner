@@ -25,7 +25,6 @@ const AddNewCategory = () => {
   const [loading, setLoading] = useState(false);
   const { fetchCategories } = useContext(CategoriesContext);
 
-
   const onCreateCategory = async () => {
     try {
       setLoading(true);
@@ -85,22 +84,25 @@ const AddNewCategory = () => {
       <InputField
         title="Category"
         value={category}
-        handleChangeText={(value: React.SetStateAction<string>) =>
-          setCategory(value)
-        }
+        handleChangeText={(value: string) => setCategory(value)}
         logo="bookmark"
-        placeholder="New Category"
+        placeholder="Tên khoản chi"
         keyboardType="default"
         otherStyles={{}}
       />
       <InputField
         title="Total Budget"
-        value={totalBudget}
-        handleChangeText={(value: React.SetStateAction<number>) =>
-          setTotalBudget(value)
-        }
+        value={totalBudget.toString()}
+        handleChangeText={(value: string) => {
+          const newValue = value.trim();
+          if (!isNaN(parseInt(newValue))) {
+            setTotalBudget(parseInt(newValue));
+          } else {
+            setTotalBudget(0);
+          }
+        }}
         logo="cash"
-        placeholder="Total Budget"
+        placeholder="Tổng số tiền"
         keyboardType="numeric"
         otherStyles={{}}
       />
@@ -112,7 +114,7 @@ const AddNewCategory = () => {
         {loading ? (
           <ActivityIndicator size={"large"} color={"white"} />
         ) : (
-          <Text style={styles.btnText}>Create</Text>
+          <Text style={styles.btnText}>Tạo khoản chi</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -149,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.PRIMARYA,
   },
   btnText: {
-    fontFamily: "rb",
+    fontFamily: "ab",
     fontSize: 20,
     color: "white",
   },

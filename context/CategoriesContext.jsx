@@ -29,7 +29,7 @@ export const CategoriesProvider = ({ children }) => {
   };
   const fetchExpenseItems = async () => {
     const expenseItems = await getExpenseItems();
-    setExpenseItems(expenseItems);
+    setExpenseItems(expenseItems.reverse());
   };
 
   useEffect(() => {

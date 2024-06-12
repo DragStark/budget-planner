@@ -56,13 +56,13 @@ const Home = () => {
       <View>
         <Header />
         <CircularChart />
-        <Text style={styles.label}>Latest Budget</Text>
+        <Text style={styles.label}>Danh sách khoản chi</Text>
         <ScrollView
           style={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
         >
-          <CategoriesList categoriesList={categoriesList} />
+          <CategoriesList categoriesList={categoriesList.reverse()} />
         </ScrollView>
       </View>
       <View style={styles.addBtnContainer}>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   label: {
-    fontFamily: "rb",
+    fontFamily: "ab",
     fontSize: 20,
     marginTop: 20,
     marginLeft: 20,

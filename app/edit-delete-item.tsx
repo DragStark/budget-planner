@@ -19,6 +19,7 @@ import { client } from "@/utils/KindeConfig";
 import supabase from "@/utils/Supabase";
 import { router, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import CustomModal from "@/components/CustomModal";
 
 const EditDeleteItem = () => {
   const [seletedType, setseletedType] = useState("expense");
@@ -27,7 +28,17 @@ const EditDeleteItem = () => {
   const [detail, setDetail] = useState("");
   const [tagFocused, setTagFocused] = useState(0);
   const { tagsList, expenseItems } = useContext(CategoriesContext);
-  const [seletedTag, setSeletedTag] = useState({});
+  const [tagListVisible, setTagListVisible] = useState(false);
+  const [seletedTag, setSeletedTag] = useState({
+    id: 0,
+    created_at: new Date(),
+    name: "",
+    iconName: "",
+    color: "",
+    type: "",
+    parentId: 0,
+    most_used: false,
+  });
   const [loading, setLoading] = useState(false);
   const { itemId } = useLocalSearchParams();
 
@@ -36,15 +47,23 @@ const EditDeleteItem = () => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    console.log(currentDate.toISOString());
-    setShow(false);
-    setDate(currentDate);
+  const onChange = ({ type }: any, selectedDate: Date) => {
+    if (type == "set") {
+      const currentDate = selectedDate || date;
+      setDate(currentDate);
+    }
   };
 
   useMemo(() => {
-    const currentItem = expenseItems.filter((item) => item.id == itemId)[0];
+    let itemIdString: string;
+    if (Array.isArray(itemId)) {
+      itemIdString = itemId[0];
+    } else if (typeof itemId === "string") {
+      itemIdString = itemId;
+    }
+    const currentItem = expenseItems.filter(
+      (item: { id: number }) => item.id === parseInt(itemIdString, 10)
+    )[0];
     if (currentItem) {
       setMoney(currentItem.money);
       setName(currentItem.name);
@@ -52,13 +71,13 @@ const EditDeleteItem = () => {
       setDate(new Date(currentItem.time));
       setseletedType(currentItem.type);
       const currentTag = tagsList.filter(
-        (tag) => tag.id == currentItem.tag_id
+        (tag: { id: number }) => tag.id == currentItem.tag_id
       )[0];
       setSeletedTag(currentTag);
     }
   }, []);
 
-  const truncateTagName = (name) => {
+  const truncateTagName = (name: string) => {
     if (name.length > 8) {
       return name.substring(0, 5) + "...";
     }
@@ -66,47 +85,58 @@ const EditDeleteItem = () => {
   };
 
   const onEdit = () => {
-    setLoading(true);
-    Alert.alert("Are You Sure", "Are you sure you want to edit?", [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Yes",
-          style: "destructive",
-          onPress: async () => {
-            await supabase.from("ExpenseItems")
-            .update({
-                money: money,
-                name: name,
-                detail: detail,
-                type: seletedType,
-                tag_id: seletedTag.id,
-                time: date,
-            })
-            .eq("id", itemId)
-            .select()
-  
-            await fetchExpenseItems();
-            setLoading(false);
-            Alert.alert("Items Updated");    
-            router.replace("/tracking");
-          },
-        },
-      ]);
-  }
+    if (date > new Date()) {
+      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
+      return false;
+    }
 
-  const onDelete = () => {
-    setLoading(true);
-    Alert.alert("Are You Sure", "Are you sure you want to delete?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert("Are You Sure", "bạn có chắc muốn thay đổi ?", [
+      { text: "không", style: "cancel" },
       {
-        text: "Yes",
+        text: "có",
         style: "destructive",
         onPress: async () => {
+          setLoading(true);
+          await supabase
+            .from("ExpenseItems")
+            .update({
+              money: money,
+              name: name,
+              detail: detail,
+              type: seletedType,
+              tag_id: seletedTag.id,
+              time: date,
+            })
+            .eq("id", itemId)
+            .select();
+
+          await fetchExpenseItems();
+          setLoading(false);
+          Alert.alert("Mục đã được cập nhật");
+          router.replace("/tracking");
+        },
+      },
+    ]);
+  };
+
+  const onDelete = () => {
+    if (date > new Date()) {
+      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
+      return false;
+    }
+
+    Alert.alert("Are You Sure", "bạn có chắc muốn xóa?", [
+      { text: "không", style: "cancel" },
+      {
+        text: "có",
+        style: "destructive",
+        onPress: async () => {
+          setLoading(true);
           await supabase.from("ExpenseItems").delete().eq("id", itemId);
 
           await fetchExpenseItems();
-          setLoading(false); 
-          Alert.alert("Items Deleted");
+          setLoading(false);
+          Alert.alert("Mục đã được xóa");
           router.replace("/tracking");
         },
       },
@@ -115,9 +145,6 @@ const EditDeleteItem = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}> Edit/Delete Items</Text>
-      </View>
       <View style={styles.typeContainer}>
         <View
           style={[
@@ -131,7 +158,7 @@ const EditDeleteItem = () => {
               seletedType === "expense" && { color: "white" },
             ]}
           >
-            Expense
+            Chi ra
           </Text>
         </View>
         <View
@@ -146,7 +173,7 @@ const EditDeleteItem = () => {
               seletedType === "income" && { color: "white" },
             ]}
           >
-            Income
+            Thu vào
           </Text>
         </View>
       </View>
@@ -217,38 +244,51 @@ const EditDeleteItem = () => {
               </Text>
             </View>
             <View>
-              {show && (
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                  }}
-                >
+              <View>
+                <CustomModal isOpen={show} withInput={false}>
                   <DateTimePicker
                     testID="dateTimePicker"
                     value={date}
                     mode="datetime"
-                    is24Hour={true}
-                    display="default"
-                    onChange={onChange}
+                    display="spinner"
+                    onChange={() => onChange}
+                    style={{ backgroundColor: "white" }}
+                    textColor={Colors.PRIMARYA}
                   />
-                  <Text style={{ color: Colors.SECONDARYB }}>Changing</Text>
-                </View>
-              )}
-              <TouchableOpacity onPress={() => setShow(true)}>
+                  <TouchableOpacity
+                    onPress={() => setShow(false)}
+                    style={styles.btnDone}
+                  >
+                    <Text style={styles.btnModalText}>Xong</Text>
+                  </TouchableOpacity>
+                </CustomModal>
                 {!show && (
-                  <Text style={styles.dateText}>
-                    {date.toLocaleDateString()} {date.toLocaleTimeString()}
-                  </Text>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      gap: 5,
+                    }}
+                  >
+                    <Text style={styles.dateText}>
+                      {date.toLocaleDateString()} {date.toLocaleTimeString()}
+                    </Text>
+                    <TouchableOpacity onPress={() => setShow(true)}>
+                      <Ionicons name="calendar" size={30} />
+                    </TouchableOpacity>
+                  </View>
                 )}
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         }
         <View style={styles.mostUseContainer}>
-          <Text style={styles.mostUse}>most used tags</Text>
-          <TouchableOpacity style={styles.allTagsContainer}>
+          <Text style={styles.mostUse}>mục thường dùng</Text>
+          <TouchableOpacity
+            style={styles.allTagsContainer}
+            onPress={() => setTagListVisible(true)}
+          >
             <Text
               style={{
                 fontFamily: "rr",
@@ -256,7 +296,7 @@ const EditDeleteItem = () => {
                 color: Colors.categories.b,
               }}
             >
-              All Tags
+              Tất cả mục
             </Text>
             <Ionicons
               name="chevron-forward"
@@ -264,40 +304,107 @@ const EditDeleteItem = () => {
               color={Colors.categories.b}
             />
           </TouchableOpacity>
+          <CustomModal isOpen={tagListVisible} withInput={false}>
+            <View style={styles.tagListContainer}>
+              {tagsList
+                .filter((tag: { type: string }) => tag.type === seletedType)
+                .map(
+                  (tag: {
+                    id: number;
+                    created_at: Date;
+                    name: string;
+                    iconName: string;
+                    color: string;
+                    type: string;
+                    parentId: number;
+                    most_used: boolean;
+                  }) => (
+                    <TouchableOpacity
+                      key={tag.id}
+                      style={styles.categoryContainer}
+                      onPress={() => {
+                        setTagFocused(tag.id);
+                        setSeletedTag(tag);
+                      }}
+                    >
+                      <DisplayIcon
+                        name={tag.iconName}
+                        color={tag.color}
+                        otherStyles={[
+                          {
+                            width: 60,
+                            height: 60,
+                            borderRadius: 5,
+                          },
+                          tagFocused === tag.id && {
+                            backgroundColor: "#ebebeb",
+                            borderColor: "#FF9C01",
+                          },
+                        ]}
+                      />
+                      <Text style={{ marginTop: 5 }}>
+                        {truncateTagName(tag.name)}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                )}
+            </View>
+            <TouchableOpacity
+              onPress={() => setTagListVisible(false)}
+              style={styles.btnDone}
+            >
+              <Text style={styles.btnText}>Xong</Text>
+            </TouchableOpacity>
+          </CustomModal>
         </View>
+
         <View style={styles.categoriesContainer}>
           <View style={styles.listMostUse}>
             {tagsList
-              .filter((tag) => tag.most_used && tag.type === seletedType)
-              .map((tag) => (
-                <TouchableOpacity
-                  key={tag.id}
-                  style={styles.categoryContainer}
-                  onPress={() => {
-                    setTagFocused(tag.id);
-                    setSeletedTag(tag);
-                  }}
-                >
-                  <DisplayIcon
-                    name={tag.iconName}
-                    color={tag.color}
-                    otherStyles={[
-                      {
-                        width: 60,
-                        height: 60,
-                        borderRadius: 5,
-                      },
-                      tagFocused === tag.id && {
-                        backgroundColor: "#ebebeb",
-                        borderColor: "#FF9C01",
-                      },
-                    ]}
-                  />
-                  <Text style={{ marginTop: 5 }}>
-                    {truncateTagName(tag.name)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              .filter(
+                (tag: { most_used: boolean; type: string }) =>
+                  tag.most_used && tag.type === seletedType
+              )
+              .map(
+                (tag: {
+                  id: number;
+                  created_at: Date;
+                  name: string;
+                  iconName: string;
+                  color: string;
+                  type: string;
+                  parentId: number;
+                  most_used: boolean;
+                }) => (
+                  <TouchableOpacity
+                    key={tag.id}
+                    style={styles.categoryContainer}
+                    onPress={() => {
+                      setTagFocused(tag.id);
+                      setSeletedTag(tag);
+                    }}
+                  >
+                    <DisplayIcon
+                      name={tag.iconName}
+                      color={tag.color}
+                      otherStyles={[
+                        {
+                          width: 60,
+                          height: 60,
+                          borderRadius: 5,
+                        },
+                        tagFocused === tag.id && {
+                          backgroundColor: "#ebebeb",
+                          borderColor: "#FF9C01",
+                        },
+                      ]}
+                    />
+                    <Text style={{ marginTop: 5 }}>
+                      {truncateTagName(tag.name)}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              )}
 
             <View style={styles.categoryContainer}>
               <DisplayIcon
@@ -316,22 +423,22 @@ const EditDeleteItem = () => {
         <View style={{ flexDirection: "row", display: "flex", gap: 10 }}>
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: Colors.categories.b }]}
-              onPress={() => onEdit()}
+            onPress={() => onEdit()}
           >
             {loading ? (
               <ActivityIndicator size={"large"} color={"white"} />
             ) : (
-              <Text style={styles.btnText}>Edit</Text>
+              <Text style={styles.btnText}>Sửa</Text>
             )}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: Colors.PRIMARYA }]}
-              onPress={() => onDelete()}
+            onPress={() => onDelete()}
           >
             {loading ? (
               <ActivityIndicator size={"large"} color={"white"} />
             ) : (
-              <Text style={styles.btnText}>Delete</Text>
+              <Text style={styles.btnText}>Xóa</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -379,7 +486,7 @@ const styles = StyleSheet.create({
   },
   typeLabel: {
     fontSize: 20,
-    fontFamily: "rr",
+    fontFamily: "ab",
     color: "gray",
   },
   tagContainer: {
@@ -393,11 +500,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.GRAY,
     justifyContent: "space-between",
+    width: "100%",
   },
   tagSubContainer: {
     display: "flex",
     flexDirection: "row",
     gap: 10,
+    width: "30%",
   },
   dateText: {
     fontSize: 16,
@@ -457,7 +566,31 @@ const styles = StyleSheet.create({
   btnText: {
     color: "white",
     fontSize: 20,
-    fontFamily: "rb",
+    fontFamily: "ab",
     textAlign: "right",
+  },
+  dateTimePicker: {
+    height: 35,
+  },
+  btnDone: {
+    backgroundColor: Colors.PRIMARYA,
+    height: 40,
+    width: 200,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  btnModalText: {
+    fontFamily: "ar",
+    color: "white",
+  },
+  tagListContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Alert,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import { Colors } from "@/constants/Colors";
@@ -19,6 +20,7 @@ import { client } from "@/utils/KindeConfig";
 import supabase from "@/utils/Supabase";
 import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import CustomModal from "@/components/CustomModal";
 
 const Add = () => {
   const [seletedType, setseletedType] = useState("expense");
@@ -27,36 +29,49 @@ const Add = () => {
   const [detail, setDetail] = useState("");
   const [tagFocused, setTagFocused] = useState(0);
   const { tagsList } = useContext(CategoriesContext);
-  const [seletedTag, setSeletedTag] = useState({});
+  const [seletedTag, setSeletedTag] = useState({
+    id: 0,
+    created_at: new Date(),
+    name: "",
+    iconName: "",
+    color: "",
+    type: "",
+    parentId: 0,
+    most_used: false,
+  });
   const [loading, setLoading] = useState(false);
-
-  const { fetchExpenseItems } = useContext(CategoriesContext);
-
-  const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    console.log(currentDate.toISOString());
-    setShow(false);
-    setDate(currentDate);
-  };
+  const [date, setDate] = useState(new Date());
+  const { fetchExpenseItems } = useContext(CategoriesContext);
+  const [tagListVisible, setTagListVisible] = useState(false);
 
   useEffect(() => {
     const defaultTag = tagsList.filter(
-      (tag) => tag.most_used && tag.type === seletedType
+      (tag: { most_used: boolean; type: string }) =>
+        tag.most_used && tag.type === seletedType
     )[0];
     setSeletedTag(defaultTag);
   }, []);
 
-  const truncateTagName = (name) => {
+  const truncateTagName = (name: string) => {
     if (name.length > 8) {
       return name.substring(0, 5) + "...";
     }
     return name;
   };
 
+  const onChange = ({ type }: any, selectedDate: Date) => {
+    if (type == "set") {
+      const currentDate = selectedDate || date;
+      setDate(currentDate);
+    }
+  };
+
   const onAddExpenseItem = async () => {
+    if (date > new Date()) {
+      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
+      return false;
+    }
     try {
       setLoading(true);
       const user = await client.getUserDetails();
@@ -81,10 +96,10 @@ const Add = () => {
         setDate(new Date());
         setseletedType("expense");
         const defaultTag = tagsList.filter(
-          (tag) => tag.most_used && tag.type === "expense"
+          (tag: {most_used: boolean, type: string}) => tag.most_used && tag.type === "expense"
         )[0];
         setSeletedTag(defaultTag);
-        Alert.alert("Success", "Expense added successfully", [{ text: "OK" }], {
+        Alert.alert("Success", "Thêm mục thành công", [{ text: "OK" }], {
           cancelable: true,
         });
         router.replace("tracking");
@@ -103,7 +118,7 @@ const Add = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}> Add New Expense/Income</Text>
+        <Text style={styles.headerTitle}> Thêm mục Thu/Chi</Text>
       </View>
       <View style={styles.typeContainer}>
         <TouchableOpacity
@@ -114,7 +129,7 @@ const Add = () => {
           onPress={() => {
             setseletedType("expense");
             const defaultTag = tagsList.filter(
-              (tag) => tag.most_used && tag.type === "expense"
+              (tag: {most_used: boolean, type: string}) => tag.most_used && tag.type === "expense"
             )[0];
             setSeletedTag(defaultTag);
           }}
@@ -125,7 +140,7 @@ const Add = () => {
               seletedType === "expense" && { color: "white" },
             ]}
           >
-            Expense
+            Chi ra
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -136,7 +151,7 @@ const Add = () => {
           onPress={() => {
             setseletedType("income");
             const defaultTag = tagsList.filter(
-              (tag) => tag.most_used && tag.type === "income"
+              (tag: {most_used: boolean, type: string}) => tag.most_used && tag.type === "income"
             )[0];
             setSeletedTag(defaultTag);
           }}
@@ -147,7 +162,7 @@ const Add = () => {
               seletedType === "income" && { color: "white" },
             ]}
           >
-            Income
+            Thu vào
           </Text>
         </TouchableOpacity>
       </View>
@@ -175,7 +190,7 @@ const Add = () => {
             setName(value)
           }
           logo=""
-          placeholder="Name"
+          placeholder="Tên"
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
@@ -189,7 +204,7 @@ const Add = () => {
             setDetail(value)
           }
           logo=""
-          placeholder="You use money for ..."
+          placeholder="Chi tiết"
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
@@ -213,38 +228,49 @@ const Add = () => {
               </Text>
             </View>
             <View>
-              {show && (
+              <CustomModal isOpen={show} withInput={false}>
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode="datetime"
+                  display="spinner"
+                  onChange={()=>onChange}
+                  style={{ backgroundColor: "white" }}
+                  textColor={Colors.PRIMARYA}
+                />
+                <TouchableOpacity
+                  onPress={() => setShow(false)}
+                  style={styles.btnDone}
+                >
+                  <Text style={styles.btnText}>Xong</Text>
+                </TouchableOpacity>
+              </CustomModal>
+              {!show && (
                 <View
                   style={{
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-end",
+                    gap: 5,
                   }}
                 >
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={date}
-                    mode="datetime"
-                    is24Hour={true}
-                    display="default"
-                    onChange={onChange}
-                  />
-                  <Text style={{ color: Colors.SECONDARYB }}>Changing</Text>
-                </View>
-              )}
-              <TouchableOpacity onPress={() => setShow(true)}>
-                {!show && (
                   <Text style={styles.dateText}>
                     {date.toLocaleDateString()} {date.toLocaleTimeString()}
                   </Text>
-                )}
-              </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShow(true)}>
+                    <Ionicons name="calendar" size={30} />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
         }
         <View style={styles.mostUseContainer}>
-          <Text style={styles.mostUse}>most used tags</Text>
-          <TouchableOpacity style={styles.allTagsContainer}>
+          <Text style={styles.mostUse}>mục thường dùng</Text>
+          <TouchableOpacity
+            style={styles.allTagsContainer}
+            onPress={() => setTagListVisible(true)}
+          >
             <Text
               style={{
                 fontFamily: "rr",
@@ -252,7 +278,7 @@ const Add = () => {
                 color: Colors.categories.b,
               }}
             >
-              All Tags
+              Tất cả mục
             </Text>
             <Ionicons
               name="chevron-forward"
@@ -260,12 +286,53 @@ const Add = () => {
               color={Colors.categories.b}
             />
           </TouchableOpacity>
+          <CustomModal isOpen={tagListVisible} withInput={false}>
+            <View style={styles.tagListContainer}>
+              {tagsList
+                .filter((tag: {type: string}) => tag.type === seletedType)
+                .map((tag: { id: number; created_at: Date; name: string; iconName: string; color: string; type: string; parentId: number; most_used: boolean; }) => (
+                  <TouchableOpacity
+                    key={tag.id}
+                    style={styles.categoryContainer}
+                    onPress={() => {
+                      setTagFocused(tag.id);
+                      setSeletedTag(tag);
+                    }}
+                  >
+                    <DisplayIcon
+                      name={tag.iconName}
+                      color={tag.color}
+                      otherStyles={[
+                        {
+                          width: 60,
+                          height: 60,
+                          borderRadius: 5,
+                        },
+                        tagFocused === tag.id && {
+                          backgroundColor: "#ebebeb",
+                          borderColor: "#FF9C01",
+                        },
+                      ]}
+                    />
+                    <Text style={{ marginTop: 5 }}>
+                      {truncateTagName(tag.name)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+            </View>
+            <TouchableOpacity
+              onPress={() => setTagListVisible(false)}
+              style={styles.btnDone}
+            >
+              <Text style={styles.btnText}>Xong</Text>
+            </TouchableOpacity>
+          </CustomModal>
         </View>
         <View style={styles.categoriesContainer}>
           <View style={styles.listMostUse}>
             {tagsList
-              .filter((tag) => tag.most_used && tag.type === seletedType)
-              .map((tag) => (
+              .filter((tag: { most_used: boolean; type: string; }) => tag.most_used && tag.type === seletedType)
+              .map((tag: { id: number; created_at: Date; name: string; iconName: string; color: string; type: string; parentId: number; most_used: boolean; }) => (
                 <TouchableOpacity
                   key={tag.id}
                   style={styles.categoryContainer}
@@ -294,7 +361,6 @@ const Add = () => {
                   </Text>
                 </TouchableOpacity>
               ))}
-
             <View style={styles.categoryContainer}>
               <DisplayIcon
                 name="pencil"
@@ -317,7 +383,7 @@ const Add = () => {
           {loading ? (
             <ActivityIndicator size={"large"} color={"white"} />
           ) : (
-            <Text style={styles.btnAddText}>Done</Text>
+            <Text style={styles.btnAddText}>Xong</Text>
           )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
@@ -340,7 +406,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   headerTitle: {
-    fontFamily: "rb",
+    fontFamily: "ab",
     fontSize: 20,
     color: "white",
   },
@@ -364,7 +430,7 @@ const styles = StyleSheet.create({
   },
   typeLabel: {
     fontSize: 20,
-    fontFamily: "rr",
+    fontFamily: "ab",
     color: "gray",
   },
   tagContainer: {
@@ -378,11 +444,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.GRAY,
     justifyContent: "space-between",
+    width: "100%",
   },
   tagSubContainer: {
     display: "flex",
     flexDirection: "row",
     gap: 10,
+    width: "30%",
   },
   dateText: {
     fontSize: 16,
@@ -392,7 +460,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "rr",
+    fontFamily: "ar",
     color: Colors.TEXT,
   },
   categoriesContainer: {
@@ -405,6 +473,14 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignItems: "center",
     paddingBottom: 20,
+  },
+  tagListContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
   mostUseContainer: {
     display: "flex",
@@ -443,7 +519,25 @@ const styles = StyleSheet.create({
   btnAddText: {
     color: "white",
     fontSize: 20,
-    fontFamily: "rb",
+    fontFamily: "ab",
     textAlign: "right",
+  },
+  datePickerContainer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+  },
+  btnDone: {
+    backgroundColor: Colors.PRIMARYA,
+    height: 40,
+    width: 200,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  btnText: {
+    fontFamily: "ar",
+    color: "white",
   },
 });
