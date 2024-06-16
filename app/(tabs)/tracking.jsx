@@ -19,39 +19,43 @@ const Expenses = () => {
   const [timeOptionLabel, setTimeOptionLabel] = useState("1 tháng gần đây");
 
   const filteredByTimeOption = () => {
-    let filterdItems = [];
+    let filteredItems = [];
     const currDate = new Date();
     const pastDate = new Date();
     switch (timeOption) {
       case 1:
         pastDate.setDate(currDate.getDate() - 7);
-        filterdItems = expenseItems.filter(
+        filteredItems = expenseItems.filter(
           (item) => new Date(item.time) > pastDate
         );
-        return filterdItems;
+        break;
       case 2:
         pastDate.setDate(currDate.getDate() - 30);
-        filterdItems = expenseItems.filter(
+        filteredItems = expenseItems.filter(
           (item) => new Date(item.time) > pastDate
         );
-        return filterdItems;
+        break;
       case 3:
         pastDate.setDate(currDate.getDate() - 120);
-        filterdItems = expenseItems.filter(
+        filteredItems = expenseItems.filter(
           (item) => new Date(item.time) > pastDate
         );
-        return filterdItems;
+        break;
       case 4:
         pastDate.setDate(currDate.getDate() - 365);
-        filterdItems = expenseItems.filter(
+        filteredItems = expenseItems.filter(
           (item) => new Date(item.time) > pastDate
         );
-        return filterdItems;
+        break;
       default:
-        filterdItems = expenseItems;
-        return filterdItems;
+        filteredItems = expenseItems;
+        break;
     }
+    // Sort the filtered items by time
+    filteredItems.sort((a, b) => new Date(a.time) - new Date(b.time));
+    return filteredItems;
   };
+
 
   useEffect(() => {
     fetchExpenseItems();

@@ -78,10 +78,6 @@ const EditDeleteItem = () => {
   }, []);
 
   const onEdit = () => {
-    if (date > new Date()) {
-      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
-      return false;
-    }
 
     Alert.alert("Are You Sure", "bạn có chắc muốn thay đổi ?", [
       { text: "không", style: "cancel" },
@@ -113,10 +109,6 @@ const EditDeleteItem = () => {
   };
 
   const onDelete = () => {
-    if (date > new Date()) {
-      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
-      return false;
-    }
 
     Alert.alert("Are You Sure", "bạn có chắc muốn xóa?", [
       { text: "không", style: "cancel" },
@@ -186,7 +178,6 @@ const EditDeleteItem = () => {
           logo=""
           keyboardType="numeric"
           otherStyles={{
-            fontFamily: "rr",
             textAlign: "right",
             fontSize: 30,
             paddingRight: 10,
@@ -201,7 +192,6 @@ const EditDeleteItem = () => {
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
-            fontFamily: "rr",
           }}
         />
         <InputField
@@ -213,7 +203,6 @@ const EditDeleteItem = () => {
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
-            fontFamily: "rr",
           }}
         />
         {

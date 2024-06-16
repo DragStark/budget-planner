@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import Item from "./Item";
 
-const DayList = ({ expenseItems }) => {
+const DayList = ({ expenseItems, itemDisable }) => {
   const [listItems, setListItems] = useState([]);
 
   const groupByDate = (data) => {
@@ -76,7 +76,17 @@ const DayList = ({ expenseItems }) => {
           </Text>
           <View style={styles.itemsListContainer}>
             {group.map((item) => (
-              <Item key={item.id} {...item} />
+              <Item
+                key={item.id}
+                id={item.id}
+                money={item.money}
+                name={item.name}
+                detail={item.detail}
+                type={item.type}
+                tagId={item.tag_id}
+                time={item.time}
+                isDisable={itemDisable}
+              />
             ))}
           </View>
         </View>

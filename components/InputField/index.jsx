@@ -23,6 +23,7 @@ const InputField = ({
   logo = "",
   keyboardType = "default",
   otherStyles,
+  isEditable,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -32,6 +33,16 @@ const InputField = ({
     <KeyboardAvoidingView>
       <View style={[styles.customView, isFocused && styles.focusStyle]}>
         {logo !== "" && <Ionicons name={logo} size={30} color={Colors.GRAY} />}
+        {title === "Term" && (
+          <Text style={{ fontSize: 20, fontFamily: "ar", color: Colors.TEXT }}>
+            Kì hạn :
+          </Text>
+        )}
+        {title === "InterestRate" && (
+          <Text style={{ fontSize: 20, fontFamily: "ar", color: Colors.TEXT }}>
+            Lãi suất : 
+          </Text>
+        )}
         <TextInput
           value={value}
           placeholder={placeholder}
@@ -42,11 +53,22 @@ const InputField = ({
           onBlur={() => setIsFocused(false)}
           secureTextEntry={title === "Password" && !showPassword}
           keyboardType={keyboardType}
+          editable={isEditable}
           {...props}
         />
         {title === "Money" && (
-          <Text style={{ fontSize: 30, fontFamily: "rr", color: Colors.TEXT }}>
+          <Text style={{ fontSize: 30, fontFamily: "ar", color: Colors.TEXT }}>
             đ
+          </Text>
+        )}
+        {title === "Term" && (
+          <Text style={{ fontSize: 20, fontFamily: "ar", color: Colors.TEXT }}>
+            tháng
+          </Text>
+        )}
+        {title === "InterestRate" && (
+          <Text style={{ fontSize: 20, fontFamily: "ar", color: Colors.TEXT }}>
+            %
           </Text>
         )}
       </View>
@@ -62,7 +84,7 @@ const styles = StyleSheet.create({
     height: 64, // equivalent to h-16
     paddingHorizontal: 16, // equivalent to px-4
     backgroundColor: "white", // equivalent to bg-black-100
-    borderRadius: 16, // equivalent to rounded-2xl
+    borderRadius: 10, // equivalent to rounded-2xl
     justifyContent: "center", // equivalent to
     alignItems: "center",
     flexDirection: "row",
@@ -71,7 +93,7 @@ const styles = StyleSheet.create({
   focusStyle: {
     borderColor: "#FF9C01", // equivalent to border-secondary
   },
-  inputText: { flex: 1, color: Colors.TEXT, marginLeft: 10, fontFamily: "ar" },
+  inputText: { flex: 1, color: Colors.TEXT, marginLeft: 10, fontFamily: "ar", fontSize: 22 },
 });
 
 export default InputField;

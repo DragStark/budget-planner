@@ -5,16 +5,25 @@ import { Colors } from "@/constants/Colors";
 import { CategoriesContext } from "@/context/CategoriesContext";
 import { router } from "expo-router";
 
-const Item = (props) => {
+const Item = ({
+  id,
+  money,
+  name,
+  detail,
+  type,
+  tagId,
+  time,
+  isDisable
+}) => {
   const [tag, setTag] = useState({
     id: 0,
-    name: '',
-    iconName: '',
-    color: '',
+    name: "",
+    iconName: "",
+    color: "",
   });
   const { tagsList } = useContext(CategoriesContext);
   useEffect(() => {
-    setTag(tagsList.filter((tag) => tag.id == props.tag_id)[0]);
+    setTag(tagsList.filter((tag) => tag.id == tagId)[0]);
   }, []);
   const getTime = (time) => {
     const date = new Date(time);
@@ -37,31 +46,37 @@ const Item = (props) => {
         router.push({
           pathname: "/edit-delete-item",
           params: {
-            itemId: props.id,
+            itemId: id,
           },
         })
       }
+      disabled={isDisable ? true : false}
     >
       <View style={styles.icon}>
         <View>
-          <DisplayIcon name={tag.iconName} color={tag.color} tagName={tag.name} />
+          <DisplayIcon
+            name={tag.iconName}
+            color={tag.color}
+            tagName={tag.name}
+          />
         </View>
       </View>
       <View style={styles.info}>
         <View style={styles.leftInfo}>
-          <Text style={{ fontFamily: "asb", fontSize: 16 }}>{props.name}</Text>
-          <Text style={{ fontFamily: "ar", fontSize: 12 }}>{props.detail}</Text>
+          <Text style={{ fontFamily: "asb", fontSize: 16 }}>{name}</Text>
+          <Text style={{ fontFamily: "ar", fontSize: 12 }}>{detail}</Text>
         </View>
         <View style={styles.rightInfo}>
           <Text
             style={{
-              color: props.type === "income" ? Colors.INCOME : Colors.EXPENSE,
+              color: type === "income" ? Colors.INCOME : Colors.EXPENSE,
             }}
           >
-            {props.type === "income" ? "+ ": "- "}{props.money}đ
+            {type === "income" ? "+ " : "- "}
+            {money}đ
           </Text>
           <Text style={{ fontFamily: "ar", fontSize: 12 }}>
-            {getTime(props.time)}
+            {getTime(time)}
           </Text>
         </View>
       </View>

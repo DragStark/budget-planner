@@ -28,7 +28,7 @@ const DisplayIcon = ({ name, color, otherStyles, tagName, iconSize, showFullName
       >
         <Ionicons name={name} size={iconSize ? iconSize : 25} color={color} />
       </View>
-      <Text>{tagName ? (showFullName ?  tagName : truncateTagName(tagName)) : ""}</Text>
+      {tagName ? <Text>{showFullName ?  tagName : truncateTagName(tagName)}</Text>: <></> }
     </View>
   );
 };

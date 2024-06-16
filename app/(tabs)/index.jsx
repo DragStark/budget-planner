@@ -34,17 +34,7 @@ const Home = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const loggedOut = await client.logout();
-      if (loggedOut) {
-        await services.storeData("login", "false");
-        router.replace("/login");
-      }
-    } catch (error) {
-      console.error("Error in handleLogout:", error);
-    }
-  };
+  
 
   useEffect(() => {
     fetchCategories();
@@ -62,7 +52,7 @@ const Home = () => {
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
         >
-          <CategoriesList categoriesList={categoriesList.reverse()} />
+          <CategoriesList categoriesList={categoriesList} />
         </ScrollView>
       </View>
       <View style={styles.addBtnContainer}>

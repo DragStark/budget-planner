@@ -28,7 +28,6 @@ const Add = () => {
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
   const [tagFocused, setTagFocused] = useState(0);
-  const { tagsList } = useContext(CategoriesContext);
   const [seletedTag, setSeletedTag] = useState({
     id: 0,
     created_at: new Date(),
@@ -42,7 +41,8 @@ const Add = () => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [date, setDate] = useState(new Date());
-  const { fetchExpenseItems } = useContext(CategoriesContext);
+  const { tagsList, fetchExpenseItems, budgetPlans, fetchBudgetPlans } =
+    useContext(CategoriesContext);
   const [tagListVisible, setTagListVisible] = useState(false);
 
   useEffect(() => {
@@ -50,8 +50,8 @@ const Add = () => {
       (tag) => tag.most_used && tag.type === seletedType
     )[0];
     setSeletedTag(defaultTag);
+    fetchBudgetPlans();
   }, []);
-
 
   const onChange = ({ type }, selectedDate) => {
     if (type == "set") {
@@ -60,11 +60,33 @@ const Add = () => {
     }
   };
 
+  const updateBudgetPlans = (user) => {
+    budgetPlans.forEach(async (item) => {
+      const start = new Date(item.dateStart);
+      const end = new Date(item.dateEnd);
+      const updateProgress =
+        seletedType === "income"
+          ? item.progress + parseInt(money)
+          : item.progress - parseInt(money);
+      if (date >= start && date <= end) {
+        try {
+          const { data, error } = await supabase
+            .from("BudgetPlans")
+            .update({ progress: updateProgress })
+            .eq("id", item.id)
+            .select();
+          await fetchBudgetPlans();
+          if (error) {
+            throw error;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
+  };
+
   const onAddExpenseItem = async () => {
-    if (date > new Date()) {
-      Alert.alert("warning", "ngày phải là ngày hôm nay trở về trước");
-      return false;
-    }
     try {
       setLoading(true);
       const user = await client.getUserDetails();
@@ -82,6 +104,7 @@ const Add = () => {
         .select();
       if (data) {
         await fetchExpenseItems();
+        updateBudgetPlans(user);
         setLoading(false);
         setMoney(0);
         setDetail("");
@@ -101,8 +124,6 @@ const Add = () => {
       if (error) {
         throw error;
       }
-
-      console.log(data);
     } catch (error) {
       console.error("Error in getCategoriesList:", error);
     }
@@ -219,7 +240,7 @@ const Add = () => {
                   value={date}
                   mode="datetime"
                   display="spinner"
-                  maximumDate={new Date()}
+                  // maximumDate={new Date()}
                   onChange={onChange}
                   style={{ backgroundColor: "white" }}
                   textColor={Colors.PRIMARYA}

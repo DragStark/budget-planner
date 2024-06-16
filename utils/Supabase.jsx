@@ -25,6 +25,7 @@ export const getCategoriesList = async () => {
   }
 };
 
+
 export const getParentTags = async () => {
   try {
     let { data, error } = await supabase.from("ParrentTags").select("name");
@@ -67,5 +68,40 @@ export const getExpenseItems = async () => {
     console.error(error);
   }
 };
+
+export const getBudgetPlans = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("BudgetPlans")
+      .select("*")
+      .eq("created_by", user.email);
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("BudgetPlans", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getInstallments = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("Installments")
+      .select("*")
+      .eq("created_by", user.email);
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("Installments", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 export default supabase;

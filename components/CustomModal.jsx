@@ -4,13 +4,16 @@ import {
   View,
   Modal,
   KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import React, { Children } from "react";
 
-
 const CustomModal = ({ isOpen, withInput, children, ...rest }) => {
   const content = withInput ? (
-    <KeyboardAvoidingView style={styles.overlay}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.overlay}
+    >
       <View style={styles.contentContainer}>{children}</View>
     </KeyboardAvoidingView>
   ) : (
