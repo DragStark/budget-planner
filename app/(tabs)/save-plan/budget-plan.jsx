@@ -51,9 +51,8 @@ const BudgetPlan = () => {
       if (name.length > 15) {
         return name.substring(0, 15) + "...";
       }
-    }
-    else {
-      return ""
+    } else {
+      return "";
     }
     return name;
   };
@@ -195,17 +194,28 @@ const BudgetPlan = () => {
             style={styles.selectedTagsContainer}
             onPress={() => setTagsListVisible(true)}
           >
-            <DisplayIcon
-              name={selectedTag.iconName}
-              color={selectedTag.color}
-              otherStyles={[
-                {
-                  width: 60,
-                  height: 60,
-                  borderWidth: 0,
-                },
-              ]}
-            />
+            {selectedTag.name ? (
+              <>
+                <DisplayIcon
+                  name={selectedTag.iconName}
+                  color={selectedTag.color}
+                  otherStyles={[
+                    {
+                      width: 60,
+                      height: 60,
+                      borderWidth: 0,
+                    },
+                  ]}
+                />
+                <Text style={styles.iconName}>
+                  {truncateTagName(selectedTag.name)}
+                </Text>
+              </>
+            ) : (
+              <Text style={{ fontSize: 20, fontFamily: "ar", margin: 5 }}>
+                chọn danh mục cho khoản chi
+              </Text>
+            )}
             <Text style={styles.iconName}>
               {truncateTagName(selectedTag.name)}
             </Text>
@@ -321,6 +331,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
+    backgroundColor:"white"
   },
   datePickerText: {
     fontFamily: "ar",
@@ -334,6 +345,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 5,
     marginTop: 10,
+    alignItems: "center",
+    backgroundColor:"white",
+    borderColor: Colors.GRAY,
   },
   iconName: {
     fontFamily: "ar",

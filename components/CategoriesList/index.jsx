@@ -14,23 +14,35 @@ const CategoriesList = ({ categoriesList }) => {
     router.push({
       pathname: "/category-details",
       params: {
-        categoryId: category.id
-      }
-    })
-  }
+        categoryId: category.id,
+      },
+    });
+  };
 
   const caculateTotalCost = (data) => {
     let total = 0;
     data.forEach((item) => {
       total += item.cost;
     });
-    return total
-  }
+    return total;
+  };
+
+  const truncateString = (str) => {
+    if (str.length > 15) {
+      return str.substring(0, 15) + "...";
+    }
+    return str;
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.listContainer}>
         {categoriesList.map((category) => (
-          <TouchableOpacity key={category.id} style={styles.itemContainer} onPress={()=>onCategoryClick(category)}>
+          <TouchableOpacity
+            key={category.id}
+            style={styles.itemContainer}
+            onPress={() => onCategoryClick(category)}
+          >
             <View
               style={[
                 styles.categoryContainer,
@@ -42,9 +54,18 @@ const CategoriesList = ({ categoriesList }) => {
             <View style={styles.infoContainer}>
               <View>
                 <Text style={styles.categoryName}>{category.name}</Text>
-                <Text style={{ fontFamily: 'ar'}}>{category.CategoryItems ? category.CategoryItems.length : '0'} mục</Text>
+                <Text style={{ fontFamily: "ar" }}>
+                  {category.CategoryItems ? category.CategoryItems.length : "0"}{" "}
+                  mục
+                </Text>
+                <Text style={{ fontFamily: "ar" }}>
+                  {truncateString(category.detail)}
+                </Text>
               </View>
-              <Text style={styles.budget}> {caculateTotalCost(category.CategoryItems)}/{category.assigned_budget}</Text>
+              <Text style={styles.budget}>
+
+                {caculateTotalCost(category.CategoryItems)}đ
+              </Text>
             </View>
           </TouchableOpacity>
         ))}

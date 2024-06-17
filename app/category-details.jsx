@@ -37,7 +37,7 @@ const CategoryDetails = () => {
       >
         <Ionicons name="caret-back" size={50} color={Colors.PRIMARYA} />
       </TouchableOpacity>
-      <CourseInfo data={categoryData} />
+      <CourseInfo category={categoryData} />
       <Text style={styles.listTitle}> Danh sách mục chi</Text>
       <CourseItemList data={categoryData} />
       <View style={styles.addBtnContainer}>
