@@ -16,6 +16,12 @@ const SavePlan = () => {
         <TouchableOpacity style={styles.btn} onPress={()=> router.push("save-plan/installment")}>
           <Text style={styles.btnLabel}>Sổ tay trả góp</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={()=> router.push("save-plan/periodic-invoices")}>
+          <Text style={styles.btnLabel}>hóa đơn định kì</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={()=> router.push("save-plan/family-plan")}>
+          <Text style={styles.btnLabel}>Sổ chi tiêu gia đình</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

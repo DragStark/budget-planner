@@ -1,17 +1,20 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { client } from "@/utils/KindeConfig";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import defaultAvatar from "../../assets/images/default-avatar.jpg"; // Make sure the path is correct
+import { CategoriesContext } from "../../context/CategoriesContext";
+import supabase from "../../utils/Supabase";
+import { router } from "expo-router";
 
 const Header = () => {
   const [user, setUser] = useState({
-    id: '',
-    given_name: '',
-    family_name: '',
-    email: '',
-    picture: '',
+    id: "",
+    given_name: "",
+    family_name: "",
+    email: "",
+    picture: "",
   });
 
   const getUserData = async () => {
@@ -37,22 +40,26 @@ const Header = () => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            width: '75%',
+            width: "75%",
           }}
         >
           <View>
-            <Text style={{ color: "white", fontSize: 20, fontFamily: 'ar'}}>Xin chào!</Text>
+            <Text style={{ color: "white", fontSize: 20, fontFamily: "ar" }}>
+              Xin chào!
+            </Text>
             <Text
               style={{
                 color: "white",
                 fontSize: 20,
-                fontFamily: 'ab'
+                fontFamily: "ab",
               }}
             >
               {user?.given_name}
             </Text>
           </View>
-          <Ionicons name="notifications" size={24} color="white" />
+          <TouchableOpacity onPress={()=>router.push("notifications")}>
+            <Ionicons name="notifications" size={24} color="white" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>

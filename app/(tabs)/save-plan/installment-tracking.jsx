@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   previewDeck: {
     display: "flex",
     backgroundColor: "white",
-    height: 140,
+    height: "auto",
     width: "95%",
     margin: 10,
     borderRadius: 10,

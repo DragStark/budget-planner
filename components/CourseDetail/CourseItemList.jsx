@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, Linking } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  Linking,
+} from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,19 +23,33 @@ const CourseItemList = ({ data }) => {
   }, [data]);
 
   const onDeleteItem = async (id) => {
-    const { error } = await supabase
-      .from("CategoryItems")
-      .delete()
-      .eq("id", id);
-    await fetchCategories();
-    Alert.alert('success', "Item deleted");
+    Alert.alert("Are You Sure", "bạn có chắc muốn xóa?", [
+      { text: "không", style: "cancel" },
+      {
+        text: "có",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const { error } = await supabase
+              .from("CategoryItems")
+              .delete()
+              .eq("id", id);
+            await fetchCategories();
+
+            Alert.alert("Thành công", "Xoá mục thành công");
+          } catch (error) {
+            console.error("error in handle delete category item: ", error);
+          }
+        },
+      },
+    ]);
   };
 
   const openUrl = (url) => {
     if (url) {
       Linking.openURL(url);
     }
-  }
+  };
 
   return (
     <View>

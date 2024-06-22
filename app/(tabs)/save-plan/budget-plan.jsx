@@ -216,35 +216,34 @@ const BudgetPlan = () => {
                 chọn danh mục cho khoản chi
               </Text>
             )}
-            <Text style={styles.iconName}>
-              {truncateTagName(selectedTag.name)}
-            </Text>
           </TouchableOpacity>
           <CustomModal isOpen={tagsListVisible} withInput={false}>
             <View style={styles.tagListContainer}>
-              {tagsList.map((tag) => (
-                <TouchableOpacity
-                  key={tag.id}
-                  style={styles.categoryContainer}
-                  onPress={() => setSelectedTag(tag)}
-                >
-                  <DisplayIcon
-                    name={tag.iconName}
-                    color={tag.color}
-                    otherStyles={[
-                      {
-                        width: 60,
-                        height: 60,
-                        borderRadius: 5,
-                        backgroundColor:
-                          selectedTag.id === tag.id ? "#ffbcad" : "white",
-                      },
-                    ]}
-                    iconSize={30}
-                    tagName={tag.name}
-                  />
-                </TouchableOpacity>
-              ))}
+              {tagsList
+                .filter((tag) => tag.type === "expense")
+                .map((tag) => (
+                  <TouchableOpacity
+                    key={tag.id}
+                    style={styles.categoryContainer}
+                    onPress={() => setSelectedTag(tag)}
+                  >
+                    <DisplayIcon
+                      name={tag.iconName}
+                      color={tag.color}
+                      otherStyles={[
+                        {
+                          width: 60,
+                          height: 60,
+                          borderRadius: 5,
+                          backgroundColor:
+                            selectedTag.id === tag.id ? "#ffbcad" : "white",
+                        },
+                      ]}
+                      iconSize={30}
+                      tagName={tag.name}
+                    />
+                  </TouchableOpacity>
+                ))}
             </View>
             <TouchableOpacity
               style={styles.btnDone}
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
-    backgroundColor:"white"
+    backgroundColor: "white",
   },
   datePickerText: {
     fontFamily: "ar",
@@ -346,7 +345,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginTop: 10,
     alignItems: "center",
-    backgroundColor:"white",
+    backgroundColor: "white",
     borderColor: Colors.GRAY,
   },
   iconName: {

@@ -5,19 +5,24 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext, useEffect, useState, useCallback  } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import CompareChart from "@/components/CompareChart";
 import DayList from "@/components/ExpenseTrackList/DayList";
 import { CategoriesContext } from "@/context/CategoriesContext";
 import CustomModal from "@/components/CustomModal";
+import { useLocalSearchParams } from "expo-router";
+import supabase from "../../../utils/Supabase";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Expenses = () => {
-  const { expenseItems, fetchExpenseItems } = useContext(CategoriesContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [timeOption, setTimeOption] = useState(2);
   const [timeOptionLabel, setTimeOptionLabel] = useState("1 tháng gần đây");
+  const { email } = useLocalSearchParams();
+  const [expenseItems, setExpenseItems] = useState([]);
   const [dateStart, setDateStart] = useState(new Date());
   const [dateEnd, setDateEnd] = useState(new Date());
   const [calendarVisible, setCalendarVisible] = useState(false);
@@ -66,7 +71,8 @@ const Expenses = () => {
         break;
       case 5:
         filteredItems = expenseItems.filter(
-          (item) => new Date(item.time) >= dateStart &&  new Date(item.time) <= dateEnd
+          (item) =>
+            new Date(item.time) >= dateStart && new Date(item.time) <= dateEnd
         );
         break;
       default:
@@ -74,13 +80,34 @@ const Expenses = () => {
         break;
     }
     // Sort the filtered items by time
-    if(filteredItems) filteredItems.sort((a, b) => new Date(a.time) - new Date(b.time));
+    filteredItems.sort((a, b) => new Date(a.time) - new Date(b.time));
     return filteredItems;
   };
 
+  const getExpenseItems = async () => {
+    try {
+      let { data, error } = await supabase
+        .from("ExpenseItems")
+        .select("*")
+        .eq("created_by", email);
+      if (error) {
+        console.log(error);
+      }
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    fetchExpenseItems();
-  }, []);
+    const fetchExpenseItemData = async () => {
+      const expenseItemOfUser = await getExpenseItems();
+      if (expenseItemOfUser) {
+        setExpenseItems(expenseItemOfUser);
+      }
+    };
+    fetchExpenseItemData();
+  }, [email]);
 
   const totalExpense = () => {
     let total = 0;
@@ -106,6 +133,9 @@ const Expenses = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.timeContainer}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="chevron-back" size={30} color={"white"} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Text style={styles.headerText}>{timeOptionLabel}</Text>
           </TouchableOpacity>
@@ -168,8 +198,8 @@ const Expenses = () => {
                 value={dateStart}
                 mode="date"
                 display="spinner"
-                onChange={onChangeStart}
                 maximumDate={dateEnd}
+                onChange={onChangeStart}
                 style={{ backgroundColor: "white" }}
                 textColor={Colors.PRIMARYA}
               />
@@ -229,81 +259,87 @@ const Expenses = () => {
           </CustomModal>
         </View>
       </View>
-      <View style={styles.chartDeck}>
-        <View style={styles.compareContainer}>
-          <View style={styles.chartContainer}>
-            <CompareChart expense={totalExpense()} income={totalIncome()} />
-          </View>
-          <View style={styles.chartInfoContainer}>
-            <Text style={[styles.chartInfoText, { color: Colors.INCOME }]}>
-              {totalIncome()}đ
-            </Text>
-            <Text style={[styles.chartInfoText, { color: Colors.EXPENSE }]}>
-              {totalExpense()}đ
-            </Text>
-            <View style={{ borderTopWidth: 2, paddingTop: 10 }}>
-              <Text
-                style={[styles.chartInfoText, { color: Colors.categories.b }]}
-              >
-                {totalIncome() - totalExpense()}đ
+      {expenseItems && expenseItems.length > 0 ? (
+        <View style={styles.chartDeck}>
+          <View style={styles.compareContainer}>
+            <View style={styles.chartContainer}>
+              <CompareChart expense={totalExpense()} income={totalIncome()} />
+            </View>
+            <View style={styles.chartInfoContainer}>
+              <Text style={[styles.chartInfoText, { color: Colors.INCOME }]}>
+                {totalIncome()}đ
               </Text>
+              <Text style={[styles.chartInfoText, { color: Colors.EXPENSE }]}>
+                {totalExpense()}đ
+              </Text>
+              <View style={{ borderTopWidth: 2, paddingTop: 10 }}>
+                <Text
+                  style={[styles.chartInfoText, { color: Colors.categories.b }]}
+                >
+                  {totalIncome() - totalExpense()}đ
+                </Text>
+              </View>
             </View>
           </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "center",
+              gap: 20,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                color: Colors.INCOME,
+                fontFamily: "ab",
+                fontSize: 16,
+              }}
+            >
+              Thu vào
+            </Text>
+            <Text
+              style={{
+                textAlign: "center",
+                color: Colors.EXPENSE,
+                fontFamily: "ab",
+                fontSize: 16,
+              }}
+            >
+              Chi ra
+            </Text>
+            <Text
+              style={{
+                textAlign: "center",
+                color: Colors.categories.b,
+                fontFamily: "ab",
+                fontSize: 16,
+              }}
+            >
+              Chênh lệch
+            </Text>
+          </View>
         </View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "center",
-            gap: 20,
-          }}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.INCOME,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Thu vào
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.EXPENSE,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Chi ra
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.categories.b,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Chênh lệch
-          </Text>
-        </View>
-      </View>
+      ) : (
+        <Text>Loading...</Text>
+      )}
       <Text
         style={{
           fontSize: 20,
           fontFamily: "ab",
           color: Colors.TEXT,
           marginLeft: 20,
+          marginTop: 20,
         }}
       >
         Lịch sử
       </Text>
       <ScrollView style={styles.listContainer}>
-      { filteredByTimeOption().length ? <DayList
+        { filteredByTimeOption().length ? <DayList
           expenseItems={filteredByTimeOption().reverse()}
+          itemDisable={true}
         /> : <Text style={{ margin: 20, fontSize: 20, fontFamily: "asb", color: Colors.categories.c}}> không có mục nào !</Text>}
       </ScrollView>
     </View>
@@ -333,7 +369,10 @@ const styles = StyleSheet.create({
   timeContainer: {
     width: "100%",
     height: 50,
-    justifyContent: "center",
+    display: "flex",
+    flexDirection: "row",
+    paddingLeft: 20,
+    gap: 60,
     alignItems: "center",
     backgroundColor: Colors.PRIMARYB,
   },

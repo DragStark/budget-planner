@@ -6,7 +6,7 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useContext, useState } from "react";
 import "react-native-reanimated";
 import { CategoriesProvider } from "../context/CategoriesContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -48,6 +48,7 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return null; // You can also return a custom loading component here
   }
+
 
   return (
     // <ThemeProvider value={colorScheme !== "dark" ? DarkTheme : DefaultTheme}>
@@ -102,6 +103,24 @@ export default function RootLayout() {
             headerShown: true,
             presentation: "modal",
             headerTitle: "xóa hoặc sửa mục",
+            headerTitleStyle: {
+              fontWeight: "bold",
+              fontSize: 22,
+              fontFamily: "ab",
+              color: "white",
+            },
+            headerStyle: {
+              backgroundColor: Colors.PRIMARYA,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="notifications"
+          options={{
+            title: "Notifications",
+            headerShown: true,
+            presentation: "modal",
+            headerTitle: "Thông báo",
             headerTitleStyle: {
               fontWeight: "bold",
               fontSize: 22,

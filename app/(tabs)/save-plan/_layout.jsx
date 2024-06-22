@@ -15,6 +15,9 @@ export default function RootLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="installment" options={{ headerShown: false }} />
+      <Stack.Screen name="periodic-invoices" options={{ headerShown: false }} />
+      <Stack.Screen name="family-plan" options={{ headerShown: false }} />
+      <Stack.Screen name="family-tracking" options={{ headerShown: false }} />
     </Stack>
   );
 }

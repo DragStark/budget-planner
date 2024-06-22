@@ -6,6 +6,10 @@ import {
   getExpenseItems,
   getBudgetPlans,
   getInstallments,
+  getPeriodicInvoices,
+  getUsersList,
+  getFamilyPlan,
+  getNotifications,
 } from "../utils/Supabase"; // Ensure this path is correct
 
 export const CategoriesContext = createContext();
@@ -17,6 +21,10 @@ export const CategoriesProvider = ({ children }) => {
   const [expenseItems, setExpenseItems] = useState([]);
   const [budgetPlans, setBudgetPlans] = useState([]);
   const [installments, setInstallments] = useState([]);
+  const [periodicInvoices, setPeriodicInvoices] = useState([]);
+  const [usersList, setUsersList] = useState([]);
+  const [familyPlan, setFamilyPlan] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   const fetchCategories = async () => {
     const categories = await getCategoriesList();
@@ -46,11 +54,35 @@ export const CategoriesProvider = ({ children }) => {
     setInstallments(installments.reverse());
   };
 
+  const fetchPeriodicInvoices = async () => {
+    const periodicInvoices = await getPeriodicInvoices();
+    setPeriodicInvoices(periodicInvoices.reverse());
+  };
+
+  const fetchUsersList = async () => {
+    const usersList = await getUsersList();
+    setUsersList(usersList.reverse());
+  };
+
+  const fetchFamilyPlan = async () => {
+    const FamilyPlan = await getFamilyPlan();
+    setFamilyPlan(FamilyPlan.reverse());
+  };
+
+  const fetchNotifications = async () => {
+    const notifications = await getNotifications();
+    setNotifications(notifications.reverse());
+  };
+
   useEffect(() => {
     fetchCategories();
     fetchParentTags();
     fetchTagsList();
     fetchBudgetPlans();
+    fetchInstallments();
+    fetchPeriodicInvoices();
+    fetchFamilyPlan();
+    fetchNotifications();
   }, []);
 
   return (
@@ -66,6 +98,14 @@ export const CategoriesProvider = ({ children }) => {
         fetchBudgetPlans,
         installments,
         fetchInstallments,
+        periodicInvoices,
+        fetchPeriodicInvoices,
+        usersList,
+        fetchUsersList,
+        familyPlan,
+        fetchFamilyPlan,
+        notifications,
+        fetchNotifications,
       }}
     >
       {children}

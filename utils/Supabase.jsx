@@ -103,5 +103,71 @@ export const getInstallments = async () => {
   }
 };
 
+export const getPeriodicInvoices = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("PeriodicInvoices")
+      .select("*")
+      .eq("created_by", user.email);
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("PeriodicInvoices", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getUsersList = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("Users")
+      .select("*")
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("Users", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getFamilyPlan = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("FamilyPlans")
+      .select("*")
+      .eq("owner", user.email)
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("FamilyPlans", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getNotifications = async () => {
+  try {
+    const user = await client.getUserDetails();
+    let { data, error } = await supabase
+      .from("Notifications")
+      .select("*")
+      .eq("forUser", user.email)
+    if (error) {
+      console.log(error);
+    }
+    services.storeObjectData("Notifications", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default supabase;

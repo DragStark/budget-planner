@@ -64,7 +64,7 @@ const DayList = ({ expenseItems, itemDisable }) => {
   };
 
   if (!listItems.length) {
-    return <Text>No items available</Text>;
+    return <Text style={{ fontSize: 16, margin: 20, fontFamily: "ar"}}>Chưa có mục nào</Text>;
   }
 
   return (
