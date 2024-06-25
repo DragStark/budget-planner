@@ -1,14 +1,20 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useContext, useEffect } from "react";
 import PieChart from "react-native-pie-chart";
 import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CategoriesContext } from "@/context/CategoriesContext";
+import { router } from "expo-router";
 
-const CircularChart = () => {
+const CircularChart = ({ title }) => {
   const [values, setValues] = useState([1]);
-  const [colors, setColors] = useState([Colors.categories.a]);
-  const [sliceColor, setSliceColor] = useState([Colors.categories.a]);
+  const [colors, setColors] = useState([Colors.GRAY2]);
   const widthAndHeight = 150;
   const { categoriesList } = useContext(CategoriesContext);
 
@@ -32,7 +38,7 @@ const CircularChart = () => {
       setValues(newValues);
     } else {
       setValues([1]); // Default value to avoid empty chart
-      setColors([Colors.categories.a]); // Default color
+      setColors([Colors.GRAY2]); // Default color
     }
   };
 
@@ -41,6 +47,7 @@ const CircularChart = () => {
     values.forEach((value) => {
       totalEstimate += value;
     });
+    if (totalEstimate === 1) totalEstimate = 0;
     return totalEstimate;
   };
 
@@ -50,10 +57,16 @@ const CircularChart = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ display: "flex", flexDirection: "row", marginBottom: 20 }}>
-        <Text style={{ fontFamily: "ar" }}>Tổng đã chi:</Text>
-        <Text style={{ fontFamily: "ab" }}> {totalEstimate()} $ </Text>
-      </View>
+      {title && (
+        <View style={styles.chartTitleContainer}>
+          <Text style={styles.chartTitleLabel}>
+            Kế hoạch chi tiêu từng mục{" "}
+          </Text>
+          <TouchableOpacity onPress={() => router.replace("plan")}>
+            <Text style={styles.chartTitleDetail}>Chi tiết</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.subContainer}>
         <PieChart
           widthAndHeight={widthAndHeight}
@@ -90,6 +103,10 @@ const CircularChart = () => {
           </ScrollView>
         </View>
       </View>
+      <View style={{ display: "flex", flexDirection: "row", marginBottom: 20 }}>
+        <Text style={{ fontFamily: "ar" }}>Tổng đã chi:</Text>
+        <Text style={{ fontFamily: "ab" }}> {totalEstimate()} đ </Text>
+      </View>
     </View>
   );
 };
@@ -98,13 +115,12 @@ export default CircularChart;
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 20,
     marginLeft: 20,
     marginRight: 20,
-    marginTop: -50,
     backgroundColor: "white",
     padding: 20,
     borderRadius: 20,
-    shadowOpacity: 0.3,
     elevation: 1,
   },
   subContainer: {
@@ -124,5 +140,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 5,
     marginBottom: 5,
+  },
+  chartTitleContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  chartTitleLabel: {
+    fontSize: 16,
+    fontFamily: "asb",
+  },
+  chartTitleDetail: {
+    fontSize: 16,
+    fontFamily: "asb",
+    color: Colors.categories.c,
   },
 });

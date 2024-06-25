@@ -19,6 +19,7 @@ import { CategoriesContext } from "../context/CategoriesContext";
 import CustomModal from "../components/CustomModal";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DisplayIcon from "../components/TagDisplayIcon/index";
+import Tag from "../components/TagDisplayIcon/Tag";
 
 const AddNewCategory = () => {
   const [selectedIcon, setSelectedIcon] = useState("IC");
@@ -27,7 +28,7 @@ const AddNewCategory = () => {
   const [detail, setDetail] = useState("");
   const [totalBudget, setTotalBudget] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { fetchCategories, tagsList } = useContext(CategoriesContext);
+  const { fetchCategories, tagsList, parentTagsList } = useContext(CategoriesContext);
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [calendar2Visible, setCalendar2Visible] = useState(false);
   const [tagsListVisible, setTagsListVisible] = useState(false);
@@ -211,17 +212,7 @@ const AddNewCategory = () => {
       >
         {selectedTag.name ? (
           <>
-            <DisplayIcon
-              name={selectedTag.iconName}
-              color={selectedTag.color}
-              otherStyles={[
-                {
-                  width: 60,
-                  height: 60,
-                  borderWidth: 0,
-                },
-              ]}
-            />
+            <Tag url={selectedTag.iconUrl} />
             <Text style={styles.iconName}>
               {truncateTagName(selectedTag.name)}
             </Text>
@@ -234,36 +225,28 @@ const AddNewCategory = () => {
       </TouchableOpacity>
       <CustomModal isOpen={tagsListVisible} withInput={false}>
         <View style={styles.tagListContainer}>
-          {tagsList.map((tag) => (
-            <TouchableOpacity
-              key={tag.id}
-              style={styles.categoryContainer}
-              onPress={() => setSelectedTag(tag)}
-            >
-              <DisplayIcon
-                name={tag.iconName}
-                color={tag.color}
-                otherStyles={[
-                  {
-                    width: 60,
-                    height: 60,
-                    borderRadius: 5,
-                    backgroundColor:
-                      selectedTag.id === tag.id ? "#ffbcad" : "white",
-                  },
-                ]}
-                iconSize={30}
-                tagName={tag.name}
-              />
-            </TouchableOpacity>
+          {parentTagsList.map((parentTag, index) => (
+            <View key={index} style={styles.parentTagContainer}>
+              <Text style={styles.parentTagName}>{parentTag.name}</Text>
+              <View key={index} style={styles.childTagContainer}>
+                {tagsList
+                  .filter((tag) => tag.parrent_id === parentTag.id)
+                  .map((tag, index) => (
+                    <TouchableOpacity
+                      key={tag.id}
+                      style={styles.categoryContainer}
+                      onPress={() => {
+                        setSelectedTag(tag);
+                        setTagsListVisible(false);
+                      }}
+                    >
+                      <Tag name={tag.name} url={tag.iconUrl} />
+                    </TouchableOpacity>
+                  ))}
+              </View>
+            </View>
           ))}
         </View>
-        <TouchableOpacity
-          style={styles.btnDone}
-          onPress={() => setTagsListVisible(false)}
-        >
-          <Text style={styles.btnText}>Xong</Text>
-        </TouchableOpacity>
       </CustomModal>
 
       <TouchableOpacity
@@ -331,11 +314,12 @@ const styles = StyleSheet.create({
   selectedTagsContainer: {
     display: "flex",
     flexDirection: "row",
-    height: 60,
+    height: 70,
     borderRadius: 10,
     borderWidth: 2,
     padding: 5,
     marginTop: 10,
+    gap: 10,
     alignItems: "center",
     backgroundColor: "white",
     borderColor: Colors.GRAY,
@@ -343,6 +327,7 @@ const styles = StyleSheet.create({
   iconName: {
     fontFamily: "ar",
     fontSize: 20,
+    marginBottom: 5,
   },
   selectedTagsPlaceHolder: {
     fontFamily: "ar",
@@ -351,11 +336,29 @@ const styles = StyleSheet.create({
   },
   tagListContainer: {
     display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+  parentTagContainer: {
+    width: "100%",
+    backgroundColor: Colors.GRAY2,
+    padding: 10,
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  parentTagName: {
+    fontFamily: "asb",
+    fontSize: 16,
+    color: Colors.TEXT,
+  },
+  childTagContainer: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 20,
   },
   btnDone: {
     backgroundColor: Colors.PRIMARYA,

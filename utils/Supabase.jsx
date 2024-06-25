@@ -28,7 +28,7 @@ export const getCategoriesList = async () => {
 
 export const getParentTags = async () => {
   try {
-    let { data, error } = await supabase.from("ParrentTags").select("name");
+    let { data, error } = await supabase.from("ParrentTags").select("*");
     if (error) {
       throw error;
     }

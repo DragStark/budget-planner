@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/(tabs)/index.jsx", "app/(tabs)/save-plan/family-plan.jsx", "app/(tabs)/save-plan/installment-tracking.jsx", "app/_layout.jsx", "app/save-plan/_layout.jsx", "app/(tabs)/_layout.jsx", "app/(tabs)/wallet.jsx", "app/(tabs)/profile.jsx", "app/(tabs)/index.jsx", "components/CustomModal.jsx", "components/CompareChart/index.jsx", "components/ExpenseTrackList/DayList.jsx", "components/ExpenseTrackList/Item.jsx", "components/TagDisplayIcon/index.jsx", "app/add-new-category.jsx", "app/category-details.jsx", "app/edit-delete-item.jsx", "app/(tabs)/add.jsx", "app/(tabs)/tracking.jsx", "components/Header/index.jsx", "app/login.jsx", "app/add-new-category-item.jsx", "app/login.jsx", "components/CategoriesList/index.jsx", "components/CircularChart/index.jsx", "components/ColorPicker/index.jsx", "components/CourseDetail/CourseInfo.jsx", "components/CourseDetail/CourseItemList.jsx", "components/InputField/index.jsx"  ]
 }

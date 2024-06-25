@@ -92,7 +92,7 @@ const BudgetPlanList = ({ budgetPlanList }) => {
               </View>
               <View style={styles.rightContainer}>
                 <Text style={styles.itemName}>
-                  {item.progress + "/" + item.money}
+                  {item.progress}
                 </Text>
                 <Text style={styles.itemDetail}>
                   {dateStart.toLocaleDateString() +
@@ -200,8 +200,11 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-end",
+    width: "50%",
   },
-  leftContainer: {},
+  leftContainer: {
+    width: "50%",
+  },
   itemName: {
     fontSize: 20,
     fontFamily: "asb",

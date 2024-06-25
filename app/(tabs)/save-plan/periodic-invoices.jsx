@@ -9,8 +9,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { client } from "../../../utils/KindeConfig";
 import supabase from "../../../utils/Supabase";
 import { CategoriesContext } from "../../../context/CategoriesContext";
-import DisplayIcon from "../../../components/TagDisplayIcon";
 import PeriodicInvoicesList from "../../../components/PeriodicInvoices/PeriodicInvoicesList";
+import Tag from "../../../components/TagDisplayIcon/Tag";
 
 const PeriodicInvoices = () => {
   const [name, setName] = useState("");
@@ -24,7 +24,7 @@ const PeriodicInvoices = () => {
   const [tagsListVisible, setTagsListVisible] = useState(false);
   const [typeVisible, setTypeVisible] = useState(false);
 
-  const { periodicInvoices, fetchPeriodicInvoices, tagsList } =
+  const { periodicInvoices, fetchPeriodicInvoices, tagsList, parentTagsList } =
     useContext(CategoriesContext);
 
   const truncateTagName = (name) => {
@@ -360,61 +360,41 @@ const PeriodicInvoices = () => {
           >
             {selectedTag.name ? (
               <>
-                <DisplayIcon
-                  name={selectedTag.iconName}
-                  color={selectedTag.color}
-                  otherStyles={[
-                    {
-                      width: 60,
-                      height: 60,
-                      borderWidth: 0,
-                    },
-                  ]}
-                />
+                <Tag url={selectedTag.iconUrl} />
                 <Text style={styles.iconName}>
                   {truncateTagName(selectedTag.name)}
                 </Text>
               </>
             ) : (
               <Text style={{ fontSize: 20, fontFamily: "ar", margin: 5 }}>
-                chọn danh mục cho hóa đơn
+                chọn danh mục cho khoản chi
               </Text>
             )}
           </TouchableOpacity>
           <CustomModal isOpen={tagsListVisible} withInput={false}>
             <View style={styles.tagListContainer}>
-              {tagsList
-                .filter((tag) => tag.type === "expense")
-                .map((tag) => (
-                  <TouchableOpacity
-                    key={tag.id}
-                    style={styles.categoryContainer}
-                    onPress={() => setSelectedTag(tag)}
-                  >
-                    <DisplayIcon
-                      name={tag.iconName}
-                      color={tag.color}
-                      otherStyles={[
-                        {
-                          width: 60,
-                          height: 60,
-                          borderRadius: 5,
-                          backgroundColor:
-                            selectedTag.id === tag.id ? "#ffbcad" : "white",
-                        },
-                      ]}
-                      iconSize={30}
-                      tagName={tag.name}
-                    />
-                  </TouchableOpacity>
-                ))}
+              {parentTagsList.map((parentTag, index) => (
+                <View key={index} style={styles.parentTagContainer}>
+                  <Text style={styles.parentTagName}>{parentTag.name}</Text>
+                  <View key={index} style={styles.childTagContainer}>
+                    {tagsList
+                      .filter((tag) => tag.parrent_id === parentTag.id)
+                      .map((tag, index) => (
+                        <TouchableOpacity
+                          key={tag.id}
+                          style={styles.categoryContainer}
+                          onPress={() => {
+                            setSelectedTag(tag);
+                            setTagsListVisible(false);
+                          }}
+                        >
+                          <Tag name={tag.name} url={tag.iconUrl} />
+                        </TouchableOpacity>
+                      ))}
+                  </View>
+                </View>
+              ))}
             </View>
-            <TouchableOpacity
-              style={styles.btnDone}
-              onPress={() => setTagsListVisible(false)}
-            >
-              <Text style={styles.btnText}>Xong</Text>
-            </TouchableOpacity>
           </CustomModal>
           {/* button submit form and close modal */}
           <View style={styles.btnGroup}>
@@ -561,10 +541,28 @@ const styles = StyleSheet.create({
   },
   tagListContainer: {
     display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+  parentTagContainer: {
+    width: "100%",
+    backgroundColor: Colors.GRAY2,
+    padding: 10,
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  parentTagName: {
+    fontFamily: "asb",
+    fontSize: 16,
+    color: Colors.TEXT,
+  },
+  childTagContainer: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 20,
   },
 });

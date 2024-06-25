@@ -133,15 +133,6 @@ const AddNewCategoryItem = () => {
             otherStyles={{}}
           />
           <InputField
-            title="Url"
-            value={url}
-            handleChangeText={setUrl}
-            logo="link"
-            placeholder="Link"
-            keyboardType="default"
-            otherStyles={{}}
-          />
-          <InputField
             title="Note"
             value={note}
             handleChangeText={setNote}

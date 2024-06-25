@@ -20,10 +20,10 @@ const Login = () => {
             <Image source={LoginBg || { uri: '' }} style={styles.bg} />
             <View style={styles.loginDeckContainer}>
                 <View>
-                    <Text style={styles.title}>Personal Budget Planner</Text>
+                    <Text style={styles.title}>Quản lí chi tiêu cá nhân</Text>
                 </View>
                 <TouchableOpacity style={styles.btnLogin} onPress={handleSignIn}>
-                    <Text style={styles.btnText}>Login / Sign Up</Text>
+                    <Text style={styles.btnText}>Đăng nhập / Đăng kí</Text>
                 </TouchableOpacity>
             </View>
         </View>

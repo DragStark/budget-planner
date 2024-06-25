@@ -4,7 +4,8 @@ import {
   View,
   Modal,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  ScrollView,
 } from "react-native";
 import React, { Children } from "react";
 
@@ -18,7 +19,9 @@ const CustomModal = ({ isOpen, withInput, children, ...rest }) => {
     </KeyboardAvoidingView>
   ) : (
     <View style={styles.overlay}>
-      <View style={styles.contentContainer}>{children}</View>
+      <View style={styles.contentContainer}>
+        <ScrollView>{children}</ScrollView>
+      </View>
     </View>
   );
   return (
@@ -49,6 +52,8 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     justifyContent: "center",
-    width: "80%", // Adjust the width as needed
+    width: "90%", // Adjust the width as needed
+    maxWidth: "100%",
+    maxHeight: "90 %"
   },
 });

@@ -20,7 +20,7 @@ const CompareChart = ({expense, income}) => {
         style={[
           styles.bar,
           {
-            height: expense === 0 ? 0 : `${expense <= income ? 100 : barHeight}%`,
+            height: income === 0 ? 0 : `${expense <= income ? 100 : barHeight}%`,
             backgroundColor: Colors.INCOME,
           },
         ]}
@@ -29,7 +29,7 @@ const CompareChart = ({expense, income}) => {
         style={[
           styles.bar,
           {
-            height: income === 0 ? 0 : `${expense > income ? 100 : barHeight}%`,
+            height: expense === 0 ? 0 : `${expense > income ? 100 : barHeight}%`,
             backgroundColor: Colors.EXPENSE,
           },
         ]}

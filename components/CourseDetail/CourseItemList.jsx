@@ -82,9 +82,6 @@ const CourseItemList = ({ data }) => {
                         color={Colors.PRIMARYA}
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => openUrl(item.url)}>
-                      <Ionicons name="open" size={30} color={Colors.PRIMARYA} />
-                    </TouchableOpacity>
                   </View>
                 )}
               </View>

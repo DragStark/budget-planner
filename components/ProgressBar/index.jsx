@@ -6,7 +6,11 @@ const ProgressBar = ({ budget, progress }) => {
   const [perc, setPerc] = useState(0);
 
   useEffect(() => {
-    setPerc((progress / budget) * 100);
+    if (progress <= 0) {
+      setPerc(0);
+    } else {
+      setPerc((progress / budget) * 100);
+    }
   }, []);
 
   return (

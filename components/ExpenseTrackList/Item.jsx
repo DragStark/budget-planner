@@ -4,17 +4,9 @@ import DisplayIcon from "../TagDisplayIcon";
 import { Colors } from "@/constants/Colors";
 import { CategoriesContext } from "@/context/CategoriesContext";
 import { router } from "expo-router";
+import Tag from "../TagDisplayIcon/Tag";
 
-const Item = ({
-  id,
-  money,
-  name,
-  detail,
-  type,
-  tagId,
-  time,
-  isDisable
-}) => {
+const Item = ({ id, money, name, detail, type, tagId, time, isDisable }) => {
   const [tag, setTag] = useState({
     id: 0,
     name: "",
@@ -54,11 +46,7 @@ const Item = ({
     >
       <View style={styles.icon}>
         <View>
-          <DisplayIcon
-            name={tag.iconName}
-            color={tag.color}
-            tagName={tag.name}
-          />
+          <Tag url={tag.iconUrl} />
         </View>
       </View>
       <View style={styles.info}>

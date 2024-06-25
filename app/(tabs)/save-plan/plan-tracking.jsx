@@ -57,66 +57,6 @@ const PlanTracking = () => {
         </View>
       </View>
       <View style={styles.chartDeck}>
-        {/* <View style={styles.compareContainer}>
-          <View style={styles.chartContainer}>
-            <CompareChart expense={totalExpense()} income={totalIncome()} />
-          </View>
-          <View style={styles.chartInfoContainer}>
-            <Text style={[styles.chartInfoText, { color: Colors.INCOME }]}>
-              {totalIncome()}đ
-            </Text>
-            <Text style={[styles.chartInfoText, { color: Colors.EXPENSE }]}>
-              {totalExpense()}đ
-            </Text>
-            <View style={{ borderTopWidth: 2, paddingTop: 10 }}>
-              <Text
-                style={[styles.chartInfoText, { color: Colors.categories.b }]}
-              >
-                {totalIncome() - totalExpense()}đ
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "center",
-            gap: 20,
-          }}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.INCOME,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Thu vào
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.EXPENSE,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Chi ra
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.categories.b,
-              fontFamily: "ab",
-              fontSize: 16,
-            }}
-          >
-            Chênh lệch
-          </Text>
-        </View> */}
         <View style={{ height: 60}}>
           <Text style={{ fontFamily: "ar", fontSize: 16 }}>
             <Text style={{ fontFamily: "ab", fontSize: 16 }}>Ghi chú :</Text>{" "}
@@ -173,6 +113,7 @@ const styles = StyleSheet.create({
   chartDeck: {
     margin: 20,
     backgroundColor: "white",
+    width: "90%",
     height: 160,
     padding: 20,
     borderRadius: 10,

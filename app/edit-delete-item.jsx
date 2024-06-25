@@ -3,11 +3,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-  TextInput,
-  Keyboard,
   KeyboardAvoidingView,
   Alert,
   ActivityIndicator,
+  Image
 } from "react-native";
 import React, { useEffect, useState, useContext, useMemo } from "react";
 import { Colors } from "@/constants/Colors";
@@ -20,24 +19,19 @@ import supabase from "@/utils/Supabase";
 import { router, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomModal from "@/components/CustomModal";
+import Tag from "../components/TagDisplayIcon/Tag";
 
 const EditDeleteItem = () => {
   const [seletedType, setseletedType] = useState("expense");
   const [money, setMoney] = useState(0);
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
-  const [tagFocused, setTagFocused] = useState(0);
-  const { tagsList, expenseItems } = useContext(CategoriesContext);
+  const [image, setImage] = useState("");
+  const [imageVisible, setImageVisible] = useState("");
+  const { parentTagsList, tagsList, expenseItems } =
+    useContext(CategoriesContext);
   const [tagListVisible, setTagListVisible] = useState(false);
   const [seletedTag, setSeletedTag] = useState({
-    id: 0,
-    created_at: new Date(),
-    name: "",
-    iconName: "",
-    color: "",
-    type: "",
-    parentId: 0,
-    most_used: false,
   });
   const [loading, setLoading] = useState(false);
   const { itemId } = useLocalSearchParams();
@@ -70,6 +64,7 @@ const EditDeleteItem = () => {
       setDetail(currentItem.detail);
       setDate(new Date(currentItem.time));
       setseletedType(currentItem.type);
+      setImage(currentItem.imageUrl)
       const currentTag = tagsList.filter(
         (tag) => tag.id == currentItem.tag_id
       )[0];
@@ -78,7 +73,6 @@ const EditDeleteItem = () => {
   }, []);
 
   const onEdit = () => {
-
     Alert.alert("Are You Sure", "bạn có chắc muốn thay đổi ?", [
       { text: "không", style: "cancel" },
       {
@@ -109,7 +103,6 @@ const EditDeleteItem = () => {
   };
 
   const onDelete = () => {
-
     Alert.alert("Are You Sure", "bạn có chắc muốn xóa?", [
       { text: "không", style: "cancel" },
       {
@@ -188,7 +181,7 @@ const EditDeleteItem = () => {
           value={name}
           handleChangeText={(value) => setName(value)}
           logo=""
-          placeholder="Name"
+          placeholder="Tên"
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
@@ -199,7 +192,7 @@ const EditDeleteItem = () => {
           value={detail}
           handleChangeText={(value) => setDetail(value)}
           logo=""
-          placeholder="You use money for ..."
+          placeholder="Chi tiết"
           keyboardType="default"
           otherStyles={{
             fontSize: 20,
@@ -207,18 +200,43 @@ const EditDeleteItem = () => {
         />
         {
           <View style={styles.tagContainer}>
-            <View style={styles.tagSubContainer}>
-              <DisplayIcon
-                name={seletedTag.iconName}
-                color={seletedTag.color}
-                tagName={seletedTag.name}
-                showFullName={true}
-                iconSize={40}
-                otherStyles={{
-                  borderWidth: 0,
-                }}
-              />
-            </View>
+            <TouchableOpacity
+              style={styles.tagSubContainer}
+              onPress={() => setTagListVisible(true)}
+            >
+              <Tag name={seletedTag.name} url={seletedTag.iconUrl} />
+            </TouchableOpacity>
+            <CustomModal isOpen={tagListVisible} withInput={false}>
+              <View style={styles.tagListContainer}>
+                {parentTagsList
+                  .filter((parentTag) => parentTag.type === seletedType)
+                  .map((parentTag, index) => (
+                    <View key={index} style={styles.parentTagContainer}>
+                      <Text style={styles.parentTagName}>{parentTag.name}</Text>
+                      <View key={index} style={styles.childTagContainer}>
+                        {tagsList
+                          .filter(
+                            (tag) =>
+                              tag.type === seletedType &&
+                              tag.parrent_id === parentTag.id
+                          )
+                          .map((tag, index) => (
+                            <TouchableOpacity
+                              key={tag.id}
+                              style={styles.categoryContainer}
+                              onPress={() => {
+                                setSeletedTag(tag);
+                                setTagListVisible(false);
+                              }}
+                            >
+                              <Tag name={tag.name} url={tag.iconUrl} />
+                            </TouchableOpacity>
+                          ))}
+                      </View>
+                    </View>
+                  ))}
+              </View>
+            </CustomModal>
             <View style={styles.tagSubContainerRight}>
               <View>
                 <CustomModal isOpen={show} withInput={false}>
@@ -260,103 +278,40 @@ const EditDeleteItem = () => {
             </View>
           </View>
         }
-        <View style={styles.mostUseContainer}>
-          <Text style={styles.mostUse}>mục thường dùng</Text>
+        <TouchableOpacity onPress={() => setImageVisible(true)}>
+          <Image
+            source={{ uri:  image}}
+            style={styles.img}
+          />
+        </TouchableOpacity>
+        <CustomModal isOpen={imageVisible} withInput={false}>
+          <Image
+            source={{ uri:  image}}
+            style={styles.imgFull}
+          />
           <TouchableOpacity
-            style={styles.allTagsContainer}
-            onPress={() => setTagListVisible(true)}
+            onPress={() => setImageVisible(false)}
+            style={{
+              backgroundColor: Colors.PRIMARYA,
+              width: 320,
+              borderRadius: 10,
+              marginTop: 10,
+              justifyContent: "center",
+              alignItems: "center",
+              height: 50,
+            }}
           >
             <Text
               style={{
-                fontFamily: "rr",
-                fontSize: 16,
-                color: Colors.categories.b,
+                fontSize: 20,
+                fontFamily: "asb",
+                color: "white",
               }}
             >
-              Tất cả mục
+              đóng
             </Text>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.categories.b}
-            />
           </TouchableOpacity>
-          <CustomModal isOpen={tagListVisible} withInput={false}>
-            <View style={styles.tagListContainer}>
-              {tagsList
-                .filter((tag) => tag.type === seletedType)
-                .map((tag) => (
-                  <TouchableOpacity
-                    key={tag.id}
-                    onPress={() => {
-                      setTagFocused(tag.id);
-                      setSeletedTag(tag);
-                    }}
-                  >
-                    <DisplayIcon
-                      name={tag.iconName}
-                      color={tag.color}
-                      otherStyles={[
-                        tagFocused === tag.id && {
-                          backgroundColor: "#ebebeb",
-                          borderColor: "#FF9C01",
-                        },
-                      ]}
-                      tagName={tag.name}
-                    />
-                  </TouchableOpacity>
-                ))}
-            </View>
-            <TouchableOpacity
-              onPress={() => setTagListVisible(false)}
-              style={styles.btnDone}
-            >
-              <Text style={styles.btnText}>Xong</Text>
-            </TouchableOpacity>
-          </CustomModal>
-        </View>
-
-        <View style={styles.categoriesContainer}>
-          <View style={styles.listMostUse}>
-            {tagsList
-              .filter((tag) => tag.most_used && tag.type === seletedType)
-              .map((tag) => (
-                <TouchableOpacity
-                  key={tag.id}
-                  onPress={() => {
-                    setTagFocused(tag.id);
-                    setSeletedTag(tag);
-                  }}
-                >
-                  <DisplayIcon
-                    name={tag.iconName}
-                    color={tag.color}
-                    otherStyles={[
-                      {
-                        height: 60,
-                        width: 60,
-                      },
-                      tagFocused === tag.id && {
-                        backgroundColor: "#ebebeb",
-                        borderColor: "#FF9C01",
-                      },
-                    ]}
-                    tagName={tag.name}
-                  />
-                </TouchableOpacity>
-              ))}
-
-            <DisplayIcon
-              name="pencil"
-              color="blue"
-              tagName="Change"
-              otherStyles={{
-                height: 60,
-                width: 60,
-              }}
-            />
-          </View>
-        </View>
+        </CustomModal>
         <View style={{ flexDirection: "row", display: "flex", gap: 10 }}>
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: Colors.categories.b }]}
@@ -534,10 +489,39 @@ const styles = StyleSheet.create({
   },
   tagListContainer: {
     display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+  parentTagContainer: {
+    width: "100%",
+    backgroundColor: Colors.GRAY2,
+    padding: 10,
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  parentTagName: {
+    fontFamily: "asb",
+    fontSize: 16,
+    color: Colors.TEXT,
+  },
+  childTagContainer: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 20,
+  },
+  img: {
+    width: 395,
+    height: 200,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  imgFull: {
+    width: 320,
+    height: 320,
+    borderRadius: 10,
   },
 });
