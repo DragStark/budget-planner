@@ -23,19 +23,23 @@ const FamilyPlan = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-  const [color, setColor] = useState("");
-  const [expenseList, setExpenseList] = useState([]);
-  const [incomeList, setIncomeList] = useState([]);
-  const [colorList, setColorList] = useState([]);
-  const { usersList, fetchUsersList, familyPlan, fetchFamilyPlan } =
-    useContext(CategoriesContext);
+  const {
+    usersList,
+    fetchUsersList,
+    familyPlan,
+    fetchFamilyPlan,
+    fetchNotifications,
+  } = useContext(CategoriesContext);
 
   const onOpenAddModal = () => {
     setEmail("");
     setRole("");
-    setColor("");
     setModalVisible(true);
   };
+
+  useEffect(()=>{
+    fetchFamilyPlan();
+  }, [])
 
   const getExpenseItems = async (email) => {
     try {
@@ -64,33 +68,6 @@ const FamilyPlan = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchUsersList();
-      await fetchFamilyPlan();
-
-      const tempExpenseList = [];
-      const tempIncomeList = [];
-      const tempColorList = [];
-
-      await Promise.all(
-        familyPlan.map(async (planItem) => {
-          const { totalExpense, totalIncome } = await getExpenseItems(
-            planItem.member
-          );
-          tempExpenseList.push(totalExpense);
-          tempIncomeList.push(totalIncome);
-          tempColorList.push(planItem.color);
-        })
-      );
-
-      setExpenseList(tempExpenseList);
-      setIncomeList(tempIncomeList);
-      setColorList(tempColorList);
-    };
-
-    fetchData();
-  }, []);
 
   const onCreate = async () => {
     if (usersList.find((user) => user.email == email)) {
@@ -104,7 +81,6 @@ const FamilyPlan = () => {
               owner: user.email,
               member: email,
               role: role,
-              color: color,
             },
           ])
           .select();
@@ -113,6 +89,38 @@ const FamilyPlan = () => {
         }
         fetchFamilyPlan();
         Alert.alert("Thành công", "Thêm thành viên mới thành công");
+        setModalVisible(false);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      Alert.alert("Lỗi", "Người dùng không có trong hệ thống");
+    }
+  };
+
+  const onRequestAddNewMember = async () => {
+    if (usersList.find((user) => user.email == email)) {
+      try {
+        const user = await client.getUserDetails();
+
+        const { data, error } = await supabase
+          .from("Notifications")
+          .insert([
+            {
+              name: `Thông báo về sổ chi tiêu gia đình`,
+              detail: `Người dùng ${user.email} muốn thêm bạn vào sổ chi tiêu gia đình với vai trò là ${role}`,
+              dateNoti: new Date().toLocaleDateString(),
+              forUser: email,
+              ref: "family-plan",
+            },
+          ])
+          .select();
+
+        if (error) {
+          throw error;
+        }
+        fetchNotifications();
+        Alert.alert("Thành công", `Đã gửi yêu cầu đến người dùng ${email}`);
         setModalVisible(false);
       } catch (error) {
         console.error(error);
@@ -149,12 +157,7 @@ const FamilyPlan = () => {
               value={role}
               handleChangeText={(value) => setRole(value)}
               placeholder="Vai trò"
-              otherStyles={{
-                color: color,
-              }}
             />
-            {/* Pick color for role */}
-            <ColorPicker selectedColor={color} onSelectColor={setColor} />
             {/* Button submit form and close modal */}
             <View style={styles.btnGroup}>
               <TouchableOpacity
@@ -164,7 +167,7 @@ const FamilyPlan = () => {
                 <Text style={styles.btnAddText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onCreate()}
+                onPress={() => onRequestAddNewMember()}
                 disabled={email === "" || role === ""}
                 style={styles.btnAdd}
               >

@@ -16,7 +16,10 @@ import supabase from "../../utils/Supabase";
 import { client } from "../../utils/KindeConfig";
 
 const MembersList = ({ familyPlan }) => {
-  const { usersList, fetchFamilyPlan } = useContext(CategoriesContext);
+  const { usersList, fetchFamilyPlan, fetchUsersList } = useContext(CategoriesContext);
+  useEffect(()=>{
+    fetchUsersList();
+  },[])
 
   const handleDeleteMember = (item) => {
     Alert.alert("Are You Sure", "bạn có chắc muốn xóa?", [

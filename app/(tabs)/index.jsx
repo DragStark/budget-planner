@@ -489,6 +489,7 @@ const Home = () => {
     fetchInstallments();
     fetchCategories();
     fetchPeriodicInvoices();
+    fetchNotifications();
   }, []);
 
   return (
